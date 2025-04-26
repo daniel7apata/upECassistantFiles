@@ -23,7 +23,7 @@ mensaje_commit = st.text_input("Mensaje del commit", value="Actualización de ar
 contrasenia_acceso = st.text_input("Contraseña de subida")
 
 if archivo and ruta_en_repo:
-    if contrasenia_acceso = CONTRASENIA_ACCESO:
+    if contrasenia_acceso == CONTRASENIA_ACCESO:
         contenido = archivo.read()
         contenido_b64 = base64.b64encode(contenido).decode("utf-8")
         url = f"https://api.github.com/repos/{REPO}/contents/{ruta_en_repo}"
