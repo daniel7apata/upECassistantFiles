@@ -11,6 +11,7 @@ CONTRASENIA_ACCESO = st.secrets["contrasenia_acceso"]
 
 st.title("📤 Subir archivos para EC-Assistant")
 
+contrasenia_acceso = st.text_input("Contraseña de subida")
 # Cargar archivo
 archivo = st.file_uploader("Selecciona un archivo para subir")
 
@@ -20,7 +21,7 @@ ruta_en_repo = st.text_input("Ruta en el repositorio (ej: carpeta/archivo.txt)")
 # Mensaje del commit
 mensaje_commit = st.text_input("Mensaje del commit", value="Actualización de archivo")
 
-contrasenia_acceso = st.text_input("Contraseña de subida")
+
 
 if contrasenia_acceso == CONTRASENIA_ACCESO:
     if archivo and ruta_en_repo:
@@ -55,4 +56,4 @@ if contrasenia_acceso == CONTRASENIA_ACCESO:
                 st.error(f"❌ Error {response.status_code}")
                 st.json(response.json())
     else: 
-        st.success("❌ Contraseña incorrecta")
+        st.error("❌ Contraseña incorrecta")
