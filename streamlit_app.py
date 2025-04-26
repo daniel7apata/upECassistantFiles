@@ -4,7 +4,7 @@ import base64
 
 # Lectura segura del token desde Streamlit Secrets
 GITHUB_TOKEN = st.secrets["github_token"]
-REPO = "usuario/nombre-del-repo"
+REPO = "daniel7apata/upECassistantFiles"
 BRANCH = "main"
 
 st.title("📤 Subir o actualizar archivo en GitHub")
