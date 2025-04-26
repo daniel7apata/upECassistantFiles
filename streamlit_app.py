@@ -24,7 +24,7 @@ mensaje_commit = st.text_input("Mensaje del commit", value="Actualización de ar
 
 
 if contrasenia_acceso == CONTRASENIA_ACCESO:
-    if archivo and ruta_en_repo:
+    if archivo and ruta_en_repo and ruta_en_repo is not "streamlit_app.py":
         contenido = archivo.read()
         contenido_b64 = base64.b64encode(contenido).decode("utf-8")
         url = f"https://api.github.com/repos/{REPO}/contents/{ruta_en_repo}"
