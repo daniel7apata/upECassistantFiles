@@ -103,6 +103,6 @@ else:
 if creds:
     service = build("drive", "v3", credentials=creds)
 
-    file_id = "TU_FILE_ID_DE_GOOGLE_DOCS"
+    file_id = "1UtK5l4WNK-4XG_iGckqC5Era3PDOJ80VL4KpjlVkt84"
     text = export_google_doc_as_text(file_id, service)
     st.text_area("📝 Contenido del documento:", text, height=400)
