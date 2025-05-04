@@ -10,11 +10,9 @@ SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 def authenticate():
     creds = None
 
-    # Verifica si ya existe un token guardado
     if os.path.exists("token.pkl"):
         creds = pickle.load(open("token.pkl", "rb"))
 
-    # Si no hay token, se inicia el flujo OAuth
     if not creds or not creds.valid:
         client_config = {
             "installed": {
@@ -35,21 +33,23 @@ def authenticate():
             redirect_uri=redirect_uri
         )
 
-        auth_url, _ = flow.authorization_url(prompt='consent')
-        st.markdown(f"[🔐 Haz clic aquí para autenticarte con Google]({auth_url})")
-
-        code = st.text_input("🔑 Pega aquí el código que recibiste")
-        if code:
+        query_params = st.query_params
+        if "code" in query_params:
+            code = query_params["code"]
             try:
                 flow.fetch_token(code=code)
                 creds = flow.credentials
                 with open("token.pkl", "wb") as token_file:
                     pickle.dump(creds, token_file)
-                st.success("✅ Autenticación exitosa")
+                st.success("✅ Autenticación completada automáticamente")
             except Exception as e:
                 st.error(f"❌ Error al autenticar: {e}")
+        else:
+            auth_url, _ = flow.authorization_url(prompt='consent')
+            st.markdown(f"[🔐 Haz clic aquí para autenticarte con Google]({auth_url})")
 
     return creds
+
 
 def list_drive_files(creds):
     try:
