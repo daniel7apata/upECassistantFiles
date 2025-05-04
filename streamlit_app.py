@@ -65,17 +65,19 @@ def list_drive_files(creds):
         return []
 
 
-def download_file(file_id, service):
-    request = service.files().get_media(fileId=file_id)
+
+def export_google_doc_as_text(file_id, service):
+    request = service.files().export(fileId=file_id, mimeType="text/plain")
     fh = io.BytesIO()
     downloader = MediaIoBaseDownload(fh, request)
-    
+
     done = False
     while not done:
         status, done = downloader.next_chunk()
-    
+
     fh.seek(0)
-    return fh  # Devuelve un BytesIO listo para leer o cargar
+    return fh.read().decode("utf-8")
+
     
 
 # Streamlit App
@@ -98,15 +100,9 @@ else:
 
 
 
-
 if creds:
     service = build("drive", "v3", credentials=creds)
 
-    file_id = "1g0D1IunTjs9geHWneRTVAKTOfhl7D9x0"  # reemplaza con el ID real
-    file_content = download_file(file_id, service)
-
-    # Ejemplo: leer CSV si es un archivo de texto
-    import pandas as pd
-    df = pd.read_csv(file_content)
-    st.write("📄 Contenido del archivo:")
-    st.dataframe(df)
+    file_id = "TU_FILE_ID_DE_GOOGLE_DOCS"
+    text = export_google_doc_as_text(file_id, service)
+    st.text_area("📝 Contenido del documento:", text, height=400)
