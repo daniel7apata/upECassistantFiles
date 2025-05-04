@@ -47,8 +47,9 @@ def authenticate():
             except Exception as e:
                 st.error(f"❌ Error al autenticar: {e}")
         else:
-            auth_url, _ = flow.authorization_url(prompt='consent')
-            st.markdown(f"[🔐 Haz clic aquí para autenticarte con Google]({auth_url})")
+            if st.button("🔐 Autenticar con Google"):
+                auth_url, _ = flow.authorization_url(prompt='consent')
+                st.markdown(f"[Haz clic aquí para continuar ➡️]({auth_url})")
 
     return creds
 
