@@ -17,7 +17,7 @@ def authenticate():
     # Si no hay token, se inicia el flujo OAuth
     if not creds or not creds.valid:
         client_config = {
-            "installed": {
+            
                 "client_id": st.secrets["installed"]["client_id"],
                 "project_id": st.secrets["installed"]["project_id"],
                 "auth_uri": st.secrets["installed"]["auth_uri"],
@@ -25,7 +25,7 @@ def authenticate():
                 "auth_provider_x509_cert_url": st.secrets["installed"]["auth_provider_x509_cert_url"],
                 "client_secret": st.secrets["installed"]["client_secret"],
                 "redirect_uris": st.secrets["installed"]["redirect_uris"]
-            }
+          
         }
 
         redirect_uri = client_config["installed"]["redirect_uris"][0]
