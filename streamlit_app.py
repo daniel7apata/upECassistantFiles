@@ -26,7 +26,7 @@ def authenticate():
                 "token_uri": st.secrets["installed"]["token_uri"],
                 "auth_provider_x509_cert_url": st.secrets["installed"]["auth_provider_x509_cert_url"],
                 "client_secret": st.secrets["installed"]["client_secret"],
-                "redirect_uris": st.secrets["installed"]["redirect_uris"],
+                "redirect_uris": st.secrets["installed"]["redirect_uri"],
             }
         }
 
@@ -35,8 +35,12 @@ def authenticate():
             scopes=SCOPES,
         )
 
-        # Genera la URL de autorización
-        auth_url, _ = flow.authorization_url(prompt='consent')
+        # Cambia la URL de redirección a 'http://localhost:8501' para un cliente de escritorio
+        auth_url, _ = flow.authorization_url(
+            access_type='offline', 
+            include_granted_scopes='true', 
+            prompt='consent'
+        )
 
         st.markdown(f"[🔐 Haz clic aquí para autenticarte con Google]({auth_url})")
 
