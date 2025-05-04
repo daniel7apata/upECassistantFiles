@@ -64,6 +64,20 @@ def list_drive_files(creds):
         st.error(f"❌ Error al listar archivos: {e}")
         return []
 
+
+def download_file(file_id, service):
+    request = service.files().get_media(fileId=file_id)
+    fh = io.BytesIO()
+    downloader = MediaIoBaseDownload(fh, request)
+    
+    done = False
+    while not done:
+        status, done = downloader.next_chunk()
+    
+    fh.seek(0)
+    return fh  # Devuelve un BytesIO listo para leer o cargar
+    
+
 # Streamlit App
 st.title("📁 Conexión a Google Drive")
 
