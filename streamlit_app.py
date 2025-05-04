@@ -35,14 +35,24 @@ def authenticate():
             scopes=SCOPES,
         )
 
-        # Esto abre el navegador y levanta un pequeño servidor local para recibir el callback
-        creds = flow.run_local_server(port=8501, prompt="consent")
+        # Genera la URL de autorización
+        auth_url, _ = flow.authorization_url(prompt='consent')
 
-        # Guardamos el token para la próxima ejecución
-        with open(TOKEN_PATH, "wb") as token_file:
-            pickle.dump(creds, token_file)
+        st.markdown(f"[🔐 Haz clic aquí para autenticarte con Google]({auth_url})")
 
-        st.success("✅ Autenticación completada y token guardado")
+        # Pide el código de autorización a los usuarios
+        code = st.text_input("🔑 Pega aquí el código que recibiste")
+
+        if code:
+            # Intercambia el código por un token
+            flow.fetch_token(authorization_response=code)
+            creds = flow.credentials
+
+            # Guardamos el token para la próxima ejecución
+            with open(TOKEN_PATH, "wb") as token_file:
+                pickle.dump(creds, token_file)
+
+            st.success("✅ Autenticación completada y token guardado")
 
     return creds
 
