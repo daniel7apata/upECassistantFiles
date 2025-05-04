@@ -28,7 +28,7 @@ def authenticate():
             }
         }
 
-        redirect_uri = client_config["installed"]["redirect_uris"][0]
+        redirect_uri = "https://blank-app-xol4ld7qw5.streamlit.app/"
         flow = Flow.from_client_config(
             client_config=client_config,
             scopes=SCOPES,
