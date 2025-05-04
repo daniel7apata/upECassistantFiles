@@ -8,15 +8,14 @@ SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 @st.cache_resource
 def get_drive_service():
     creds_dict = {
-        "refresh_token": st.secrets["google_drive"]["refresh_token"],
+        "token": st.secrets["google_drive"]["access_token"],  # Si solo tienes access_token
         "client_id": st.secrets["google_drive"]["client_id"],
         "client_secret": st.secrets["google_drive"]["client_secret"],
         "scopes": SCOPES,
-        "token": st.secrets["google_drive"]["refresh_token"],  # necesario para compatibilidad
     }
 
     creds = Credentials.from_authorized_user_info(info=creds_dict, scopes=SCOPES)
-    service = build("drive", "v3", credentials=creds)
+    service = build('drive', 'v3', credentials=creds)
     return service
 
 def list_drive_files(service):
