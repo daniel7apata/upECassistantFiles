@@ -26,7 +26,7 @@ def authenticate():
                 "token_uri": st.secrets["installed"]["token_uri"],
                 "auth_provider_x509_cert_url": st.secrets["installed"]["auth_provider_x509_cert_url"],
                 "client_secret": st.secrets["installed"]["client_secret"],
-                "redirect_uris": st.secrets["installed"]["redirect_uri"],
+                "redirect_uri": st.secrets["installed"]["redirect_uri"],
             }
         }
 
