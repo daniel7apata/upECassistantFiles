@@ -4,6 +4,8 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 import os
 import pickle
+from googleapiclient.http import MediaIoBaseDownload
+import io
 
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
@@ -78,3 +80,19 @@ if creds and creds.valid:
         st.info("No se encontraron archivos en tu Drive")
 else:
     st.warning("🔒 Autenticación pendiente o no válida")
+
+
+
+
+
+if creds:
+    service = build("drive", "v3", credentials=creds)
+
+    file_id = "1UtK5l4WNK-4XG_iGckqC5Era3PDOJ80VL4KpjlVkt84"  # reemplaza con el ID real
+    file_content = download_file(file_id, service)
+
+    # Ejemplo: leer CSV si es un archivo de texto
+    import pandas as pd
+    df = pd.read_csv(file_content)
+    st.write("📄 Contenido del archivo:")
+    st.dataframe(df)
