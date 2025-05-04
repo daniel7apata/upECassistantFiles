@@ -1,59 +1,56 @@
 import streamlit as st
-import requests
-import base64
+import os
+import io
+import pickle
 
-# Lectura segura del token desde Streamlit Secrets
-GITHUB_TOKEN = st.secrets["github_token"]
-REPO = "daniel7apata/upECassistantFiles"
-BRANCH = "main"
-CONTRASENIA_ACCESO = st.secrets["contrasenia_acceso"]
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
 
+SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
-st.title("📤 Subir archivos para EC-Assistant")
+@st.cache_resource
+def get_drive_service():
+    creds = None
 
-contrasenia_acceso = st.text_input("Contraseña de subida")
-# Cargar archivo
-archivo = st.file_uploader("Selecciona un archivo para subir")
+    # Usa el token si ya existe (para no autenticar cada vez)
+    if os.path.exists('token.pkl'):
+        with open('token.pkl', 'rb') as token:
+            creds = pickle.load(token)
 
-# Ruta en GitHub
-ruta_en_repo = st.text_input("Ruta en el repositorio (ej: carpeta/archivo.txt)")
+    # Si no hay token, haz autenticación
+    if not creds:
+        flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+        creds = flow.run_local_server(port=0)
+        with open('token.pkl', 'wb') as token:
+            pickle.dump(creds, token)
 
-# Mensaje del commit
-mensaje_commit = st.text_input("Mensaje del commit", value="Actualización de archivo")
+    service = build('drive', 'v3', credentials=creds)
+    return service
 
+st.title("Lector de Archivos de Google Drive")
 
+if st.button("Conectar y listar archivos"):
+    service = get_drive_service()
+    results = service.files().list(
+        pageSize=10, fields="files(id, name, mimeType)").execute()
+    items = results.get('files', [])
 
-if contrasenia_acceso == CONTRASENIA_ACCESO:
-    if archivo and ruta_en_repo and ruta_en_repo is not "streamlit_app.py":
-        contenido = archivo.read()
-        contenido_b64 = base64.b64encode(contenido).decode("utf-8")
-        url = f"https://api.github.com/repos/{REPO}/contents/{ruta_en_repo}"
-        
-        headers = {
-            "Authorization": f"token {GITHUB_TOKEN}",
-            "Accept": "application/vnd.github.v3+json"
-        }
-    
-        # Verificar si ya existe el archivo
-        response = requests.get(url, headers=headers)
-        sha = response.json().get("sha") if response.status_code == 200 else None
-    
-        data = {
-            "message": mensaje_commit,
-            "content": contenido_b64,
-            "branch": BRANCH
-        }
-        if sha:
-            data["sha"] = sha
-    
-        # Subida del archivo
-        subir = st.button("Subir a GitHub")
-        if subir:
-            response = requests.put(url, json=data, headers=headers)
-            if response.status_code in [200, 201]:
-                st.success("✅ Archivo subido o actualizado correctamente.")
-            else:
-                st.error(f"❌ Error {response.status_code}")
-                st.json(response.json())
-    else: 
-        st.error("❌ Contraseña incorrecta")
+    if not items:
+        st.write("No hay archivos.")
+    else:
+        st.write("Archivos encontrados:")
+        for item in items:
+            st.write(f"{item['name']} ({item['id']})")
+
+        # Ejemplo: descargar el primero
+        file_id = items[0]['id']
+        request = service.files().get_media(fileId=file_id)
+        fh = io.BytesIO()
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+        fh.seek(0)
+        st.write("Contenido del archivo descargado:")
+        st.text(fh.read().decode('utf-8'))
